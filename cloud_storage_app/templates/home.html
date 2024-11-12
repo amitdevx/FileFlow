@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <h1>Welcome to Cloud Storage</h1>
+    {% if not current_user.is_authenticated %}
+        <div class="auth-buttons">
+            <a href="{{ url_for('login') }}" class="btn">Login</a>
+            <a href="{{ url_for('signup') }}" class="btn">Sign Up</a>
+        </div>
+    {% else %}
+        <div class="dashboard-link">
+            <a href="{{ url_for('dashboard') }}" class="btn">Go to Dashboard</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
