@@ -1,0 +1,10 @@
+.file-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.file-list th, .file-list td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}

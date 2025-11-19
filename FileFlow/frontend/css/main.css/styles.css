@@ -1,0 +1,294 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Navigation */
+nav {
+    background-color: #fff;
+    color: #333;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brand-logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin-left: 2rem;
+}
+
+.nav-links a {
+    color: #555;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Main Content */
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Dashboard */
+.dashboard-container {
+    display: flex;
+    gap: 2rem;
+}
+
+.sidebar {
+    width: 280px;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.sidebar h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #007bff;
+}
+
+.upload-form, .create-folder-form {
+    margin-bottom: 1.5rem;
+}
+
+.upload-form .btn, .create-folder-form .btn {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.create-folder-form input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+}
+
+.breadcrumb {
+    font-size: 16px;
+}
+
+.search-bar input {
+    width: 250px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+}
+
+.toolbar .btn {
+    margin-right: 5px;
+}
+
+.file-browser-list-view {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.file-item:hover {
+    background-color: #f0f0f0;
+}
+
+.file-item.selected {
+    background-color: #d0e0f0;
+}
+
+.file-icon {
+    margin-right: 15px;
+    font-size: 20px;
+}
+
+.file-name {
+    flex: 1;
+}
+
+.file-size, .file-date {
+    width: 120px;
+    text-align: right;
+}
+
+.file-actions-item {
+    width: 150px;
+    text-align: right;
+}
+
+.file-browser-grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    padding: 15px;
+}
+
+.file-browser-grid-view .file-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.file-browser-grid-view .file-icon {
+    margin-right: 0;
+    margin-bottom: 10px;
+    font-size: 40px;
+}
+
+.file-browser-grid-view .file-name {
+    font-size: 14px;
+    word-break: break-all;
+}
+
+.file-browser-grid-view .file-size,
+.file-browser-grid-view .file-date,
+.file-browser-grid-view .file-actions-item {
+    display: none;
+}
+
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    font-size: 12px;
+}
+
+.drag-over-folder {
+    background-color: #c0d0e0 !important;
+}
+
+.file-list-header {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.file-list {
+    list-style: none;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.file-name {
+    font-weight: 500;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    background-color: #007bff;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+.btn.delete {
+    background-color: #dc3545;
+}
+
+.btn.delete:hover {
+    background-color: #c82333;
+}
+
+/* Flash Messages */
+.flashes {
+    margin-bottom: 1rem;
+}
+
+.flash-message {
+    padding: 1rem;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    color: #155724;
+    margin-bottom: 0.5rem;
+}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="breadcrumb">
+                <a href="{{ url_for('dashboard') }}">Home</a>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search files...">
+            </div>
+        </div>
+        <div class="toolbar">
+            <div class="file-actions">
+                <button class="btn" id="upload-btn"><i class="fas fa-upload"></i> Upload</button>
+                <button class="btn" id="create-folder-btn"><i class="fas fa-folder-plus"></i> Create Folder</button>
+                <button class="btn" id="rename-btn" disabled><i class="fas fa-pen"></i> Rename</button>
+                <button class="btn" id="delete-btn" disabled><i class="fas fa-trash"></i> Delete</button>
+            </div>
+            <div class="view-options">
+                <button class="btn" id="list-view-btn" class="active"><i class="fas fa-list"></i></button>
+                <button class="btn" id="grid-view-btn"><i class="fas fa-th"></i></button>
+            </div>
+        </div>
+        <div id="file-browser" class="file-browser-list-view">
+            {% for file in files %}
+            <div class="file-item" data-id="{{ file.id }}" data-name="{{ file.filename }}" data-type="{{ 'folder' if file.is_folder else 'file' }}" data-size="{{ file.filesize }}" data-date="{{ file.upload_date }}" draggable="true">
+                <div class="file-icon">
+                    <i class="fas {{ 'fa-folder' if file.is_folder else 'fa-file' }}"></i>
+                </div>
+                <div class="file-name">
+                    {% if file.is_folder %}
+                        <a href="{{ url_for('dashboard', folder_id=file.id) }}">{{ file.filename }}</a>
+                    {% else %}
+                        {{ file.filename }}
+                    {% endif %}
+                </div>
+                <div class="file-size">{{ file.filesize }}</div>
+                <div class="file-date">{{ file.upload_date }}</div>
+                <div class="file-actions-item">
+                    {% if not file.is_folder %}
+                    <a href="{{ url_for('view_file', file_id=file.id) }}" class="btn btn-small" target="_blank">View</a>
+                    <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-small">Download</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="status-bar">
+        <div class="left">
+            <span id="item-count">{{ files|length }} items</span> | <span id="selection-info">0 items selected</span>
+        </div>
+        <div class="right">
+            <span>FileFlow v1.0</span>
+        </div>
+    </div>
+</div>
+
+<form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" id="upload-form" style="display:none;">
+    <input type="file" name="file" id="file-input">
+</form>
+
+<form action="{{ url_for('create_folder') }}" method="POST" id="create-folder-form" style="display:none;">
+    <input type="text" name="folder_name" id="folder-name-input" required>
+</form>
+
+{% endblock %}

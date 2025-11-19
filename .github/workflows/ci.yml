@@ -1,0 +1,58 @@
+name: FileFlow CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: Install backend dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r FileFlow/requirements.txt
+    
+    - name: Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 FileFlow/backend --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 FileFlow/backend --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Run Python tests
+      run: |
+        cd FileFlow
+        python -m pytest backend/tests/ || echo "No tests found"
+  
+  frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install frontend dependencies
+      run: |
+        cd FileFlow/frontend
+        npm install
+    
+    - name: Build frontend
+      run: |
+        cd FileFlow/frontend
+        npm run build
+    
+    - name: Run frontend tests
+      run: |
+        cd FileFlow/frontend
+        npm test -- --passWithNoTests

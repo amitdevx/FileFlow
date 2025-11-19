@@ -1,0 +1,9 @@
+.toolbar {
+  display: flex;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.toolbar button {
+  margin-right: 10px;
+}
