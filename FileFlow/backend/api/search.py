@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from backend.models.database import db, File, SearchProfile
+try:
+    from backend.models.database import db, File, SearchProfile
+except ImportError:
+    from models.database import db, File, SearchProfile
 from sqlalchemy import or_, and_
 from datetime import datetime
 

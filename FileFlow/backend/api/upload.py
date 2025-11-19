@@ -1,9 +1,13 @@
 from flask import Blueprint, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from backend.models.database import db, File
+try:
+    from backend.models.database import db, File
+    from backend.utils.validators import Validators
+except ImportError:
+    from models.database import db, File
+    from utils.validators import Validators
 from pathlib import Path
-from backend.utils.validators import Validators
 
 upload_bp = Blueprint('upload_bp', __name__)
 

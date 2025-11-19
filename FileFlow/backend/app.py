@@ -1,13 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
-from models import db, User, File, bcrypt
-from config import Config
+try:
+    from backend.models.database import db, User, File, bcrypt
+    from backend.config import Config
+except ImportError:
+    from models.database import db, User, File, bcrypt
+    from config import Config
 from pathlib import Path
+import os
 import logging
 
 # Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, 
+            template_folder='../frontend/templates',
+            static_folder='../frontend')
 app.config.from_object(Config)
 app.config['UPLOAD_FOLDER'] = Path(__file__).parent / app.config['UPLOAD_FOLDER']
 
@@ -20,7 +27,7 @@ bcrypt.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'auth_bp.login'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -56,12 +63,13 @@ def download_file(file_id):
         
         if file.user_id != current_user.id:
             abort(403, description="You don't have permission to access this file")
-            
-                    if not Path(file.filepath).exists():
-                        abort(404, description="File not found in storage")
-                        
-                    if file.is_folder:
-                        abort(400, description="Cannot download a folder")            
+        
+        if not os.path.exists(file.filepath):
+            abort(404, description="File not found in storage")
+        
+        if file.is_folder:
+            abort(400, description="Cannot download a folder")
+        
         return send_file(
             file.filepath,
             as_attachment=True,
@@ -193,7 +201,7 @@ def create_folder():
     db.session.commit()
     
     flash('Folder created successfully')
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('folders_bp.dashboard'))
 
 @app.route('/move_file/<int:file_id>', methods=['POST'])
 @login_required
@@ -216,7 +224,10 @@ def move_file(file_id):
     db.session.commit()
     return jsonify({'success': True})
 
-from services.compression_service import create_zip_archive
+try:
+    from backend.services.compression_service import CompressionService
+except ImportError:
+    from services.compression_service import CompressionService
 
 @app.route('/archive', methods=['POST'])
 @login_required
@@ -232,7 +243,7 @@ def archive_files():
         files_to_archive.append(file.filepath)
         
     archive_name = "archive.zip"
-    create_zip_archive(files_to_archive, archive_name)
+    CompressionService.create_zip(files_to_archive, archive_name)
     
     return send_file(archive_name, as_attachment=True)
 
@@ -263,11 +274,18 @@ def init_db_command():
     init_db()
     print('Initialized the database.')
 
-from backend.api.auth import auth_bp
-from backend.api.files import files_bp
-from backend.api.folders import folders_bp
-from backend.api.search import search_bp
-from backend.api.upload import upload_bp
+try:
+    from backend.api.auth import auth_bp
+    from backend.api.files import files_bp
+    from backend.api.folders import folders_bp
+    from backend.api.search import search_bp
+    from backend.api.upload import upload_bp
+except ImportError:
+    from api.auth import auth_bp
+    from api.files import files_bp
+    from api.folders import folders_bp
+    from api.search import search_bp
+    from api.upload import upload_bp
 
 app.register_blueprint(files_bp)
 app.register_blueprint(folders_bp)
@@ -276,7 +294,10 @@ app.register_blueprint(upload_bp)
 app.register_blueprint(auth_bp)
 
 import threading
-from services.watcher_service import start_watching
+try:
+    from backend.services.watcher_service import start_watching
+except ImportError:
+    from services.watcher_service import start_watching
 
 if __name__ == '__main__':
     watch_thread = threading.Thread(target=start_watching, args=(app.config['UPLOAD_FOLDER'],))

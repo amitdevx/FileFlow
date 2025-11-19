@@ -1,7 +1,11 @@
 from flask import Blueprint, request, jsonify, send_file
 from flask_login import login_required, current_user
-from backend.services.compression_service import CompressionService
-from backend.models.database import db, File
+try:
+    from backend.services.compression_service import CompressionService
+    from backend.models.database import db, File
+except ImportError:
+    from services.compression_service import CompressionService
+    from models.database import db, File
 from pathlib import Path
 
 compression_bp = Blueprint('compression_bp', __name__)
@@ -54,7 +58,7 @@ def create_archive():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@compression_bp.route('/api/compress/extract/<int:file_id>', methods='POST'])
+@compression_bp.route('/api/compress/extract/<int:file_id>', methods=['POST'])
 @login_required
 def extract_archive(file_id):
     """Extract a compressed archive"""

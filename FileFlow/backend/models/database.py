@@ -28,5 +28,45 @@ class File(db.Model):
     is_folder = db.Column(db.Boolean, default=False)
     parent_folder_id = db.Column(db.Integer, db.ForeignKey('file.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    size = db.Column(db.Integer)
-    last_modified = db.Column(db.DateTime)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    filesize = db.Column(db.Integer, default=0)
+    mimetype = db.Column(db.String(100))
+    file_hash = db.Column(db.String(64))
+    is_favorite = db.Column(db.Boolean, default=False)
+    tags = db.Column(db.String(500))
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'filename': self.filename,
+            'filepath': self.filepath,
+            'is_folder': self.is_folder,
+            'parent_folder_id': self.parent_folder_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'modified_at': self.modified_at.isoformat() if self.modified_at else None,
+            'filesize': self.filesize,
+            'mimetype': self.mimetype,
+            'is_favorite': self.is_favorite,
+            'tags': self.tags.split(',') if self.tags else []
+        }
+
+class SearchProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    query = db.Column(db.String(500))
+    file_types = db.Column(db.String(200))
+    size_min = db.Column(db.Integer)
+    size_max = db.Column(db.Integer)
+    date_from = db.Column(db.DateTime)
+    date_to = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ShareLink(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    file_id = db.Column(db.Integer, db.ForeignKey('file.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    token = db.Column(db.String(100), unique=True, nullable=False)
+    expires_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    access_count = db.Column(db.Integer, default=0)

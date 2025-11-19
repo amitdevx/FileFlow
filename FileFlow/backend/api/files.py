@@ -1,7 +1,10 @@
 from flask import Blueprint, send_file, abort, jsonify, request
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from backend.models.database import db, File
+try:
+    from backend.models.database import db, File
+except ImportError:
+    from models.database import db, File
 from pathlib import Path
 
 files_bp = Blueprint('files_bp', __name__)
