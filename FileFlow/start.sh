@@ -10,20 +10,23 @@ echo -e "${BLUE}   FileFlow Application Startup${NC}"
 echo -e "${BLUE}=====================================${NC}"
 echo
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Check if database is initialized
-if [ ! -f "backend/instance/fileflow.db" ]; then
+if [ ! -f "$SCRIPT_DIR/backend/instance/fileflow.db" ]; then
     echo -e "${GREEN}Initializing database...${NC}"
-    cd /workspaces/file-uploader-viewing-mode-is-under-process-/FileFlow
+    cd "$SCRIPT_DIR"
     export FLASK_APP=backend.app
     flask init-db
 fi
 
 # Create user_files directory if it doesn't exist
-mkdir -p backend/user_files
+mkdir -p "$SCRIPT_DIR/backend/user_files"
 
 echo
 echo -e "${GREEN}Starting Flask backend on port 5000...${NC}"
-cd /workspaces/file-uploader-viewing-mode-is-under-process-/FileFlow
+cd "$SCRIPT_DIR"
 export FLASK_APP=backend.app
 export FLASK_ENV=development
 flask run --host=0.0.0.0 --port=5000 &
@@ -36,7 +39,7 @@ echo
 sleep 2
 
 echo -e "${GREEN}Starting React frontend on port 3000...${NC}"
-cd /workspaces/file-uploader-viewing-mode-is-under-process-/FileFlow/frontend
+cd "$SCRIPT_DIR/frontend"
 npm start &
 FRONTEND_PID=$!
 
