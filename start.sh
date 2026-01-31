@@ -18,9 +18,12 @@ fi
 
 echo "✅ Prerequisites check passed"
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Install backend dependencies
 echo "📦 Installing backend dependencies..."
-cd FileFlow/backend
+cd "$SCRIPT_DIR/FileFlow/backend"
 pip install -r ../requirements.txt
 
 # Initialize database
@@ -35,7 +38,7 @@ BACKEND_PID=$!
 
 # Install frontend dependencies
 echo "📦 Installing frontend dependencies..."
-cd ../frontend
+cd "$SCRIPT_DIR/FileFlow/frontend"
 npm install
 
 # Start frontend development server

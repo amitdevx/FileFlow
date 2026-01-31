@@ -3,8 +3,10 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 try:
     from backend.models.database import db, File
+    from backend.utils.validators import Validators
 except ImportError:
     from models.database import db, File
+    from utils.validators import Validators
 from pathlib import Path
 
 files_bp = Blueprint('files_bp', __name__)
@@ -111,11 +113,18 @@ def rename_file(file_id):
     new_name = data.get('new_name')
 
     if not new_name:
-        abort(400)
-
-    file_to_rename.filename = new_name
+        abort(400, description="New name is required")
+    
+    # Validate and sanitize the filename
+    if not Validators.is_valid_filename(new_name):
+        abort(400, description="Invalid filename")
+    
+    # Sanitize the filename to remove any dangerous characters
+    sanitized_name = Validators.sanitize_filename(new_name)
+    
+    file_to_rename.filename = sanitized_name
     db.session.commit()
-    return jsonify({'success': True, 'new_name': new_name})
+    return jsonify({'success': True, 'new_name': sanitized_name})
 
 @files_bp.route('/move_file/<int:file_id>', methods=['POST'])
 @login_required

@@ -179,12 +179,6 @@ def open_folder(folder_id):
         app.logger.error(f"Error in open_folder: {str(e)}")
         abort(500, description="Error occurred while opening folder")
 
-from datetime import datetime
-
-# ... (rest of the imports)
-
-# ... (rest of the code)
-
 @app.route('/create_folder', methods=['POST'])
 @login_required
 def create_folder():
@@ -280,18 +274,21 @@ try:
     from backend.api.folders import folders_bp
     from backend.api.search import search_bp
     from backend.api.upload import upload_bp
+    from backend.api.compression import compression_bp
 except ImportError:
     from api.auth import auth_bp
     from api.files import files_bp
     from api.folders import folders_bp
     from api.search import search_bp
     from api.upload import upload_bp
+    from api.compression import compression_bp
 
 app.register_blueprint(files_bp)
 app.register_blueprint(folders_bp)
 app.register_blueprint(search_bp)
 app.register_blueprint(upload_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(compression_bp)
 
 import threading
 try:

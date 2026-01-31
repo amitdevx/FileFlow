@@ -22,7 +22,7 @@
             </div>
             <div class="view-options">
                 <button type="button" class="btn active" id="list-view-btn" aria-pressed="true" aria-label="List view"><i class="fas fa-list" aria-hidden="true"></i></button>
-                <button class="btn" id="grid-view-btn"><i class="fas fa-th"></i></button>
+                <button type="button" class="btn" id="grid-view-btn" aria-pressed="false" aria-label="Grid view"><i class="fas fa-th" aria-hidden="true"></i></button>
             </div>
         </div>
         <div id="file-browser" class="file-browser-list-view">
@@ -64,13 +64,9 @@
     </div>
 </div>
 
-</form>
-
 <form action="{{ url_for('upload_bp.upload_file') }}" method="POST" enctype="multipart/form-data" id="upload-form" style="display:none;">
     <input type="hidden" name="folder_id" id="upload-folder-id" value="{{ current_folder_id if current_folder_id else '' }}">
     <input type="file" name="file" id="file-input">
-</form>
-
 </form>
 
 <form action="{{ url_for('folders_bp.create_folder') }}" method="POST" id="create-folder-form" style="display:none;">
