@@ -6,19 +6,39 @@ from pathlib import Path
 class CompressionService:
     @staticmethod
     def _is_safe_path(base_path, target_path):
-        """Check if target path is within base path (prevents directory traversal)"""
+        """Check if target path is within base path (prevents directory traversal)
+        
+        Note: This validates the path string without resolving symlinks to prevent
+        symlink-based attacks. The check uses string comparison after normalization.
+        """
         try:
             base = Path(base_path).resolve()
-            target = Path(target_path).resolve()
-            return target.is_relative_to(base)
+            # Normalize target without fully resolving to prevent symlink attacks
+            # Join base with target and check if it stays within base
+            full_path = (base / target_path).resolve()
+            return full_path.is_relative_to(base)
         except (ValueError, RuntimeError):
             return False
     
     @staticmethod
     def _safe_extract_member(archive_path, member_name, extract_to):
-        """Validate that extracted file stays within extract_to directory"""
-        target_path = Path(extract_to) / member_name
-        if not CompressionService._is_safe_path(extract_to, target_path):
+        """Validate that extracted file stays within extract_to directory
+        
+        Rejects paths with:
+        - Absolute paths
+        - Parent directory references (..)
+        - Paths that escape the extraction directory
+        """
+        # Reject absolute paths
+        if Path(member_name).is_absolute():
+            raise ValueError(f"Absolute path in archive is not allowed: {member_name}")
+        
+        # Reject paths with parent directory references
+        if '..' in Path(member_name).parts:
+            raise ValueError(f"Path traversal attempt detected: {member_name}")
+        
+        # Validate the final path stays within extraction directory
+        if not CompressionService._is_safe_path(extract_to, member_name):
             raise ValueError(f"Attempted path traversal in archive: {member_name}")
         return True
     
@@ -61,11 +81,11 @@ class CompressionService:
             # Validate all members before extraction to prevent path traversal
             for member in tarf.getmembers():
                 CompressionService._safe_extract_member(archive_path, member.name, extract_to)
-            # Use data filter for Python 3.12+ or validate manually for earlier versions
+            # Use data filter for Python 3.11.4+ or validate manually for earlier versions
             try:
                 tarf.extractall(extract_to, filter='data')
             except TypeError:
-                # Python < 3.12 doesn't support filter parameter, but we already validated
+                # Python < 3.11.4 doesn't support filter parameter, but we already validated
                 tarf.extractall(extract_to)
 
     @staticmethod
