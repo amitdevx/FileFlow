@@ -38,7 +38,13 @@ def upload_file():
         if is_api_request:
             return jsonify({'error': 'File type not allowed'}), 400
         flash('File type not allowed')
-        return redirect(url_for('folders_bp.dashboard', folder_id=folder_id))
+        if folder_id:
+            try:
+                return redirect(url_for('folders_bp.dashboard', folder_id=int(folder_id)))
+            except (ValueError, TypeError):
+                return redirect(url_for('folders_bp.dashboard'))
+        else:
+            return redirect(url_for('folders_bp.dashboard'))
     
     if file:
         filename = secure_filename(file.filename)
@@ -53,9 +59,17 @@ def upload_file():
         # Get file size
         file_size = filepath.stat().st_size if filepath.exists() else 0
         
+        # Convert folder_id to int if it exists
+        parent_folder_id = None
+        if folder_id:
+            try:
+                parent_folder_id = int(folder_id)
+            except (ValueError, TypeError):
+                parent_folder_id = None
+        
         new_file = File(filename=filename, filepath=str(filepath), 
                         user_id=current_user.id, 
-                        parent_folder_id=folder_id if folder_id else None)
+                        parent_folder_id=parent_folder_id)
         
         db.session.add(new_file)
         db.session.commit()
@@ -72,4 +86,7 @@ def upload_file():
             })
         
         flash('File uploaded successfully')
-        return redirect(url_for('folders_bp.dashboard', folder_id=folder_id))
+        if parent_folder_id:
+            return redirect(url_for('folders_bp.dashboard', folder_id=parent_folder_id))
+        else:
+            return redirect(url_for('folders_bp.dashboard'))
