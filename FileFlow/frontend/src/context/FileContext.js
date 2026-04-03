@@ -1,20 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-// Add axios response interceptor to handle authentication
-axios.interceptors.response.use(
-  response => response,
-  error => {
-    // If we get a 401 or if the response contains HTML redirect
-    if (error.response && error.response.status === 401) {
-      console.warn('Authentication required');
-      window.location.href = '/login';
-      return Promise.reject(error);
-    }
-    return Promise.reject(error);
-  }
-);
-
 const FileContext = createContext();
 
 export const useFiles = () => {
@@ -33,6 +19,7 @@ export const FileProvider = ({ children }) => {
   const [clipboard, setClipboard] = useState({ files: [], operation: null });
   const [history, setHistory] = useState([null]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // Assume authenticated initially
   
   const fetchFiles = useCallback(async (folderId = null, addToHistory = true) => {
     setLoading(true);
@@ -48,8 +35,9 @@ export const FileProvider = ({ children }) => {
       
       // Check if we got redirected to login (HTML response instead of JSON)
       if (typeof response.data === 'string' && response.data.includes('Redirecting')) {
-        console.warn('Not authenticated, redirecting to login');
-        window.location.href = '/login';
+        console.warn('Not authenticated');
+        setIsAuthenticated(false);
+        setFiles([]);
         return;
       }
       
@@ -90,8 +78,9 @@ export const FileProvider = ({ children }) => {
       
       // Check if error is due to authentication
       if (error.response && (error.response.status === 401 || error.response.status === 302)) {
-        console.warn('Authentication required, redirecting to login');
-        window.location.href = '/login';
+        console.warn('Authentication required');
+        setIsAuthenticated(false);
+        setFiles([]);
         return;
       }
       
@@ -237,6 +226,7 @@ export const FileProvider = ({ children }) => {
       clipboard,
       history,
       historyIndex,
+      isAuthenticated,
       fetchFiles,
       goBack,
       goForward,

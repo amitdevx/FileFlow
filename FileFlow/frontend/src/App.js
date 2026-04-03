@@ -7,6 +7,7 @@ import StatusBar from './components/StatusBar';
 import SearchPanel from './components/SearchPanel';
 import PreviewPanel from './components/PreviewPanel';
 import ContextMenu from './components/ContextMenu';
+import LoginPrompt from './components/LoginPrompt';
 import { ThemeProvider } from './context/ThemeContext';
 import { FileProvider, useFiles } from './context/FileContext';
 
@@ -19,7 +20,12 @@ function AppContent() {
   const [renameFile, setRenameFile] = useState(null);
   const [newFileName, setNewFileName] = useState('');
   
-  const { files, deleteFiles, renameFile: doRename } = useFiles();
+  const { files, deleteFiles, renameFile: doRename, isAuthenticated } = useFiles();
+  
+  // Show login prompt if not authenticated
+  if (!isAuthenticated) {
+    return <LoginPrompt />;
+  }
   
   const handleRename = (file) => {
     setRenameFile(file);
