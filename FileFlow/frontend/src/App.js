@@ -22,11 +22,6 @@ function AppContent() {
   
   const { files, deleteFiles, renameFile: doRename, isAuthenticated } = useFiles();
   
-  // Show login prompt if not authenticated
-  if (!isAuthenticated) {
-    return <LoginPrompt />;
-  }
-  
   const handleRename = (file) => {
     setRenameFile(file);
     setNewFileName(file.filename);
@@ -91,6 +86,11 @@ function AppContent() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFiles, files]);
+  
+  // Show login prompt if not authenticated (after all hooks)
+  if (!isAuthenticated) {
+    return <LoginPrompt />;
+  }
   
   return (
     <div className="App">
