@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend_fastapi
+      dockerfile: Dockerfile
+    container_name: fileflow-api
+    ports:
+      - "5000:5000"
+    environment:
+      - DEBUG=false
+      - SECRET_KEY=${SECRET_KEY:-your-super-secret-key-change-me}
+      - DATABASE_URL=sqlite+aiosqlite:///./data/fileflow.db
+      - UPLOAD_FOLDER=/app/user_files
+      - CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
+    volumes:
+      - fileflow_data:/app/data
+      - fileflow_uploads:/app/user_files
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fileflow-ui
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  fileflow_data:
+  fileflow_uploads:
