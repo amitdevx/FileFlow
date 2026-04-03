@@ -1,0 +1,173 @@
+================================================================================
+FileFlow Application - Terminal Commands to Run
+================================================================================
+
+IMPORTANT: Run these commands in SEPARATE TERMINALS in the specified order.
+
+================================================================================
+TERMINAL 1: Start Flask Backend
+================================================================================
+
+cd /home/amitdevx/codes/FileFlow/FileFlow
+
+export FLASK_APP=backend.app
+export FLASK_ENV=development
+export SECRET_KEY=testsecretkey123
+
+backend/venv/bin/flask run --host=0.0.0.0 --port=5000
+
+Expected Output:
+  * Running on http://0.0.0.0:5000
+  * Debug mode: on
+
+Wait for "Running on http://0.0.0.0:5000" before proceeding to Terminal 2.
+
+================================================================================
+TERMINAL 2: Start React Frontend (in new terminal)
+================================================================================
+
+cd /home/amitdevx/codes/FileFlow/FileFlow/frontend
+
+npm start
+
+Expected Output:
+  webpack compiled successfully
+  Compiled successfully!
+  You can now view frontend in the browser.
+  Local: http://localhost:3000
+
+Wait for "Compiled successfully!" before using the app.
+
+================================================================================
+HOW TO USE THE APP
+================================================================================
+
+1. OPEN BROWSER: http://localhost:5000
+   (NOT http://localhost:3000 - always use port 5000)
+
+2. SIGNUP:
+   - Click "Don't have an account?"
+   - Enter username, email, password
+   - Click "Sign Up"
+   - Should redirect to dashboard
+
+3. LOGIN:
+   - Username: (use the one you just created)
+   - Password: (use the one you set)
+   - Click "Login"
+   - Should redirect to dashboard
+
+4. UPLOAD FILE:
+   - Click "Upload File" button
+   - Select any file from your computer
+   - File should appear in the file list
+
+5. CREATE FOLDER:
+   - Click "New Folder" button
+   - Enter folder name
+   - Click create
+   - Folder appears in list (folder icon)
+
+6. RENAME FILE:
+   - Right-click file or folder
+   - Click "Rename"
+   - Enter new name
+   - Press Enter
+
+7. DELETE FILE:
+   - Right-click file or folder
+   - Click "Delete"
+   - File is removed
+
+8. DOWNLOAD FILE:
+   - Click on any file (not folder)
+   - Click download icon
+   - File downloads to computer
+
+9. NAVIGATE FOLDERS:
+   - Double-click folder to enter
+   - Use breadcrumb at top to go back
+   - Or click on specific folder in breadcrumb
+
+================================================================================
+TESTED WORKFLOWS (All Working)
+================================================================================
+
+✓ Signup: Creates new user account
+✓ Login: Authenticates user and creates session
+✓ File Upload: Uploads file to current folder
+✓ File List API: Returns JSON list of files
+✓ Create Folder: Creates new folder in current directory
+✓ Rename File: Renames files/folders (right-click)
+✓ Delete File: Deletes files/folders (right-click)
+✓ Breadcrumb Navigation: Navigate folder structure
+✓ Download File: Downloads files to computer (download button)
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+If Flask doesn't start:
+  - Check if port 5000 is already in use: lsof -i :5000
+  - Kill existing process: kill -9 <PID>
+  - Make sure SECRET_KEY is set (see export commands above)
+
+If React doesn't compile:
+  - Delete node_modules: rm -rf node_modules
+  - Reinstall: npm install
+  - Try again: npm start
+
+If files.map error in React:
+  - Make sure you're visiting http://localhost:5000, not :3000
+  - Clear browser cache: Ctrl+Shift+Delete
+
+If upload/rename/delete doesn't work:
+  - Make sure Flask is running on port 5000
+  - Check Flask terminal for errors
+  - Refresh page: Ctrl+F5 (hard refresh)
+
+Database:
+  - SQLite database at: /home/amitdevx/codes/FileFlow/FileFlow/instance/fileflow.db
+  - To reset: rm instance/fileflow.db && python -c "from backend.app import app, db; app.app_context().push(); db.create_all()"
+
+================================================================================
+TESTING WITHOUT UI (Curl Commands)
+================================================================================
+
+SIGNUP:
+  curl -X POST http://localhost:5000/signup \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "username=testuser&email=test@example.com&password=password123"
+
+LOGIN:
+  curl -X POST http://localhost:5000/login \
+    -c cookies.txt \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "username=testuser&password=password123"
+
+LIST FILES:
+  curl http://localhost:5000/api/files \
+    -b cookies.txt \
+    -H "Accept: application/json"
+
+UPLOAD FILE:
+  curl -X POST http://localhost:5000/upload \
+    -b cookies.txt \
+    -F "file=@/path/to/file" \
+    -F "folder_id=1"
+
+CREATE FOLDER:
+  curl -X POST http://localhost:5000/create_folder \
+    -b cookies.txt \
+    -H "Content-Type: application/json" \
+    -d '{"folder_name":"MyFolder","parent_folder_id":1}'
+
+================================================================================
+PORTS
+================================================================================
+
+Flask Backend:     http://localhost:5000
+React Frontend:    http://localhost:3000
+Database:          /home/amitdevx/codes/FileFlow/FileFlow/instance/fileflow.db
+
+================================================================================
