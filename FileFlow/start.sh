@@ -51,19 +51,27 @@ else
     echo -e "${YELLOW}Use --fastapi flag for FastAPI backend${NC}"
     echo
     
+    # Setup Flask virtual environment if it doesn't exist
+    if [ ! -d "$SCRIPT_DIR/backend/venv" ]; then
+        echo -e "${YELLOW}Creating virtual environment for Flask...${NC}"
+        python3 -m venv "$SCRIPT_DIR/backend/venv"
+        echo -e "${GREEN}Installing Flask dependencies...${NC}"
+        "$SCRIPT_DIR/backend/venv/bin/pip" install -r "$SCRIPT_DIR/backend/requirements.txt"
+    fi
+    
     # Check if database is initialized
     if [ ! -f "$SCRIPT_DIR/backend/instance/fileflow.db" ]; then
         echo -e "${GREEN}Initializing database...${NC}"
         cd "$SCRIPT_DIR"
         export FLASK_APP=backend.app
-        flask init-db
+        "$SCRIPT_DIR/backend/venv/bin/flask" init-db
     fi
     
     echo -e "${GREEN}Starting Flask backend on port 5000...${NC}"
     cd "$SCRIPT_DIR"
     export FLASK_APP=backend.app
     export FLASK_ENV=development
-    flask run --host=0.0.0.0 --port=5000 &
+    "$SCRIPT_DIR/backend/venv/bin/flask" run --host=0.0.0.0 --port=5000 &
     BACKEND_PID=$!
 fi
 
@@ -72,6 +80,13 @@ echo
 
 # Wait a moment for backend to start
 sleep 2
+
+# Check if node_modules exists, if not install dependencies
+if [ ! -d "$SCRIPT_DIR/frontend/node_modules" ]; then
+    echo -e "${YELLOW}Installing frontend dependencies...${NC}"
+    cd "$SCRIPT_DIR/frontend"
+    npm install
+fi
 
 echo -e "${GREEN}Starting React frontend on port 3000...${NC}"
 cd "$SCRIPT_DIR/frontend"
