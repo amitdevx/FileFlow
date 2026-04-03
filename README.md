@@ -17,13 +17,13 @@ Then open: http://localhost:5000
 
 ## Features
 
-- ✅ User authentication (signup/login)
-- ✅ File upload and storage
-- ✅ Create and organize folders
-- ✅ Rename and delete files
-- ✅ Download files
-- ✅ Folder navigation
-- ✅ Search functionality
+- User authentication (signup/login)
+- File upload and storage
+- Create and organize folders
+- Rename and delete files
+- Download files
+- Folder navigation
+- Search functionality
 
 ## Documentation
 
@@ -34,7 +34,7 @@ Then open: http://localhost:5000
 
 ## Project Status
 
-✅ Complete and functional
+functional
 
 ## Author
 
