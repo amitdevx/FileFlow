@@ -1,173 +1,169 @@
 ================================================================================
-FileFlow Application - Terminal Commands to Run
+                        FILEFLOW - QUICK START GUIDE
 ================================================================================
 
-IMPORTANT: Run these commands in SEPARATE TERMINALS in the specified order.
+FILEFLOW is a Google Drive clone built with Flask backend and template rendering.
 
 ================================================================================
-TERMINAL 1: Start Flask Backend
+                            INSTALLATION & SETUP
 ================================================================================
 
-cd /home/amitdevx/codes/FileFlow/FileFlow
+1. CREATE PYTHON VIRTUAL ENVIRONMENT:
+   
+   cd /home/amitdevx/codes/FileFlow/FileFlow
+   python3 -m venv backend/venv
+   backend/venv/bin/pip install -r backend/requirements.txt
 
-export FLASK_APP=backend.app
-export FLASK_ENV=development
-export SECRET_KEY=testsecretkey123
+2. INITIALIZE DATABASE:
 
-backend/venv/bin/flask run --host=0.0.0.0 --port=5000
-
-Expected Output:
-  * Running on http://0.0.0.0:5000
-  * Debug mode: on
-
-Wait for "Running on http://0.0.0.0:5000" before proceeding to Terminal 2.
+   backend/venv/bin/python -c "from backend.app import app, db; \
+   app.app_context().push(); db.create_all()"
 
 ================================================================================
-TERMINAL 2: Start React Frontend (in new terminal)
+                            RUNNING THE APPLICATION
 ================================================================================
 
-cd /home/amitdevx/codes/FileFlow/FileFlow/frontend
+START FLASK BACKEND (Terminal 1):
 
-npm start
+   cd /home/amitdevx/codes/FileFlow/FileFlow
+   export FLASK_APP=backend.app
+   export FLASK_ENV=development
+   export SECRET_KEY=your-secret-key-here
+   backend/venv/bin/flask run --host=0.0.0.0 --port=5000
 
-Expected Output:
-  webpack compiled successfully
-  Compiled successfully!
-  You can now view frontend in the browser.
-  Local: http://localhost:3000
+Expected output:
+   * Running on http://0.0.0.0:5000
 
-Wait for "Compiled successfully!" before using the app.
+IMPORTANT: Always access at http://localhost:5000 (NOT :3000)
 
 ================================================================================
-HOW TO USE THE APP
+                            USING THE APPLICATION
 ================================================================================
 
 1. OPEN BROWSER: http://localhost:5000
-   (NOT http://localhost:3000 - always use port 5000)
 
-2. SIGNUP:
-   - Click "Don't have an account?"
-   - Enter username, email, password
+2. CREATE ACCOUNT:
    - Click "Sign Up"
-   - Should redirect to dashboard
+   - Enter username, email, password
+   - Account created instantly
 
 3. LOGIN:
-   - Username: (use the one you just created)
-   - Password: (use the one you set)
-   - Click "Login"
-   - Should redirect to dashboard
+   - Enter username and password
+   - Redirected to file manager dashboard
 
-4. UPLOAD FILE:
-   - Click "Upload File" button
-   - Select any file from your computer
-   - File should appear in the file list
-
-5. CREATE FOLDER:
-   - Click "New Folder" button
-   - Enter folder name
-   - Click create
-   - Folder appears in list (folder icon)
-
-6. RENAME FILE:
-   - Right-click file or folder
-   - Click "Rename"
-   - Enter new name
-   - Press Enter
-
-7. DELETE FILE:
-   - Right-click file or folder
-   - Click "Delete"
-   - File is removed
-
-8. DOWNLOAD FILE:
-   - Click on any file (not folder)
-   - Click download icon
-   - File downloads to computer
-
-9. NAVIGATE FOLDERS:
-   - Double-click folder to enter
-   - Use breadcrumb at top to go back
-   - Or click on specific folder in breadcrumb
+4. FILE OPERATIONS:
+   - Click "Upload File" → Select file → File appears in list
+   - Right-click file → Rename/Delete
+   - Click file → Download starts
+   - Click "New Folder" → Create new folder
+   - Double-click folder → Navigate inside
+   - Breadcrumb at top → Quick navigation
 
 ================================================================================
-TESTED WORKFLOWS (All Working)
+                            API ENDPOINTS
 ================================================================================
 
-✓ Signup: Creates new user account
-✓ Login: Authenticates user and creates session
-✓ File Upload: Uploads file to current folder
-✓ File List API: Returns JSON list of files
-✓ Create Folder: Creates new folder in current directory
-✓ Rename File: Renames files/folders (right-click)
-✓ Delete File: Deletes files/folders (right-click)
-✓ Breadcrumb Navigation: Navigate folder structure
-✓ Download File: Downloads files to computer (download button)
+For developers integrating with FileFlow:
+
+GET /api/files                          List all files (requires auth)
+GET /api/files?folder_id=1              List files in folder
+GET /api/breadcrumbs/<folder_id>        Get folder navigation path
+
+POST /signup                             Create new user account
+POST /login                              Authenticate and create session
+POST /upload                             Upload file to folder
+POST /create_folder                      Create new folder
+DELETE /delete_file/<id>                 Delete file/folder
+POST /rename_file/<id>                   Rename file/folder
 
 ================================================================================
-TROUBLESHOOTING
+                            DATABASE
 ================================================================================
 
-If Flask doesn't start:
-  - Check if port 5000 is already in use: lsof -i :5000
-  - Kill existing process: kill -9 <PID>
-  - Make sure SECRET_KEY is set (see export commands above)
+Location: /home/amitdevx/codes/FileFlow/FileFlow/instance/fileflow.db
 
-If React doesn't compile:
-  - Delete node_modules: rm -rf node_modules
-  - Reinstall: npm install
-  - Try again: npm start
+Tables:
+- users          User accounts (username, email, password)
+- files          Files and folders (name, path, parent_folder_id)
+- search_profiles Search saved searches
 
-If files.map error in React:
-  - Make sure you're visiting http://localhost:5000, not :3000
-  - Clear browser cache: Ctrl+Shift+Delete
-
-If upload/rename/delete doesn't work:
-  - Make sure Flask is running on port 5000
-  - Check Flask terminal for errors
-  - Refresh page: Ctrl+F5 (hard refresh)
-
-Database:
-  - SQLite database at: /home/amitdevx/codes/FileFlow/FileFlow/instance/fileflow.db
-  - To reset: rm instance/fileflow.db && python -c "from backend.app import app, db; app.app_context().push(); db.create_all()"
+Reset database:
+   rm /home/amitdevx/codes/FileFlow/FileFlow/instance/fileflow.db
+   backend/venv/bin/python -c "from backend.app import app, db; \
+   app.app_context().push(); db.create_all()"
 
 ================================================================================
-TESTING WITHOUT UI (Curl Commands)
+                            TROUBLESHOOTING
 ================================================================================
 
-SIGNUP:
-  curl -X POST http://localhost:5000/signup \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "username=testuser&email=test@example.com&password=password123"
+FLASK WON'T START:
+- Check port 5000 isn't in use: lsof -i :5000
+- Kill existing process: kill -9 <PID>
+- Ensure SECRET_KEY is set (export SECRET_KEY=...)
 
-LOGIN:
-  curl -X POST http://localhost:5000/login \
-    -c cookies.txt \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "username=testuser&password=password123"
+FILES NOT SHOWING AFTER UPLOAD:
+- Verify Flask is running on :5000
+- Refresh page: Ctrl+F5 (hard refresh)
+- Check database at instance/fileflow.db
 
-LIST FILES:
-  curl http://localhost:5000/api/files \
-    -b cookies.txt \
-    -H "Accept: application/json"
+PAGES SHOW BLANK:
+- Clear browser cache
+- Check CSS loads: View page source, verify /static/css/styles.css
+- Check Flask error log: tail /tmp/flask.log
 
-UPLOAD FILE:
-  curl -X POST http://localhost:5000/upload \
-    -b cookies.txt \
-    -F "file=@/path/to/file" \
-    -F "folder_id=1"
-
-CREATE FOLDER:
-  curl -X POST http://localhost:5000/create_folder \
-    -b cookies.txt \
-    -H "Content-Type: application/json" \
-    -d '{"folder_name":"MyFolder","parent_folder_id":1}'
+LOGIN REDIRECTS TO BLANK PAGE:
+- Make sure you're on http://localhost:5000 not :3000
+- Log out and login again
+- Clear session cookies
 
 ================================================================================
-PORTS
+                            PRODUCTION DEPLOYMENT
 ================================================================================
 
-Flask Backend:     http://localhost:5000
-React Frontend:    http://localhost:3000
-Database:          /home/amitdevx/codes/FileFlow/FileFlow/instance/fileflow.db
+For production use:
+
+1. Change SECRET_KEY to strong random value
+2. Set FLASK_ENV=production
+3. Use production WSGI server (gunicorn, uWSGI)
+4. Set up HTTPS/SSL certificate
+5. Use PostgreSQL instead of SQLite
+6. Enable logging and monitoring
+7. Set up backup strategy for database
+
+Example production start:
+   export FLASK_ENV=production
+   export SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_hex(32))')
+   gunicorn -w 4 -b 0.0.0.0:5000 "backend.app:app"
+
+================================================================================
+                            PROJECT STRUCTURE
+================================================================================
+
+FileFlow/
+├── backend/                     Flask application
+│   ├── app.py                   Main Flask app
+│   ├── config.py                Configuration
+│   ├── api/                     API blueprints (auth, files, upload, etc)
+│   ├── models/                  Database models
+│   ├── services/                Business logic
+│   ├── utils/                   Helpers and validators
+│   └── requirements.txt          Python dependencies
+├── frontend/
+│   ├── templates/               HTML templates (login, signup, dashboard)
+│   ├── css/                     Stylesheets
+│   └── js/                      JavaScript
+├── instance/                    Runtime data
+│   └── fileflow.db              SQLite database
+└── user_files/                  Uploaded files (by user ID)
+
+================================================================================
+                            DOCUMENTATION FILES
+================================================================================
+
+README.md           Project overview and features
+COMMANDS.txt        This file - setup and usage guide
+FIXES.md            Technical details and fixes applied
+FileFlow/README.md  Application-specific documentation
+FileFlow/USAGE.md   How to use the application
 
 ================================================================================
