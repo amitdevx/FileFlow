@@ -8,7 +8,7 @@
   flex-wrap: wrap;
 }
 
-.breadcrumb a {
+.breadcrumb-link {
   color: var(--accent-color);
   text-decoration: none;
   display: inline-flex;
@@ -16,15 +16,20 @@
   gap: 0.25rem;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
   transition: background-color 0.15s;
 }
 
-.breadcrumb a:hover {
+.breadcrumb-link:hover {
   background-color: var(--bg-hover);
   text-decoration: underline;
 }
 
-.breadcrumb a i {
+.breadcrumb-link i {
   font-size: 0.9rem;
 }
 

@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFiles } from '../context/FileContext';
 import './FileList.css';
 
 function FileList({ viewMode, selectedFiles, setSelectedFiles, onContextMenu }) {
-  const { files, loading, fetchFiles, currentFolderId } = useFiles();
-  const [editingFile, setEditingFile] = useState(null);
-  const [editName, setEditName] = useState('');
+  const { files, loading, fetchFiles } = useFiles();
 
   const handleClick = (file, e) => {
     if (e.ctrlKey || e.metaKey) {

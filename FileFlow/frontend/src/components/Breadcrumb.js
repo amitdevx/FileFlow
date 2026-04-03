@@ -3,7 +3,7 @@ import { useFiles } from '../context/FileContext';
 import './Breadcrumb.css';
 
 function Breadcrumb() {
-  const { breadcrumbs, fetchFiles, currentFolderId } = useFiles();
+  const { breadcrumbs, fetchFiles } = useFiles();
   
   const handleHomeClick = (e) => {
     e.preventDefault();
@@ -17,15 +17,15 @@ function Breadcrumb() {
   
   return (
     <div className="breadcrumb">
-      <a href="#" onClick={handleHomeClick}>
+      <button type="button" className="breadcrumb-link" onClick={handleHomeClick}>
         <i className="fas fa-home"></i> Home
-      </a>
-      {breadcrumbs && breadcrumbs.map((crumb, index) => (
+      </button>
+      {breadcrumbs && breadcrumbs.map((crumb) => (
         <span key={crumb.id}>
           {' / '}
-          <a href="#" onClick={(e) => handleBreadcrumbClick(e, crumb.id)}>
+          <button type="button" className="breadcrumb-link" onClick={(e) => handleBreadcrumbClick(e, crumb.id)}>
             {crumb.name}
-          </a>
+          </button>
         </span>
       ))}
     </div>
