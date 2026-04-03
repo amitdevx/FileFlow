@@ -1,6 +1,20 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
+// Add axios response interceptor to handle authentication
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    // If we get a 401 or if the response contains HTML redirect
+    if (error.response && error.response.status === 401) {
+      console.warn('Authentication required');
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
+    return Promise.reject(error);
+  }
+);
+
 const FileContext = createContext();
 
 export const useFiles = () => {
@@ -32,7 +46,22 @@ export const FileProvider = ({ children }) => {
         headers: { 'Accept': 'application/json' }
       });
       
-      setFiles(response.data || []);
+      // Check if we got redirected to login (HTML response instead of JSON)
+      if (typeof response.data === 'string' && response.data.includes('Redirecting')) {
+        console.warn('Not authenticated, redirecting to login');
+        window.location.href = '/login';
+        return;
+      }
+      
+      // Ensure we always set an array
+      const filesData = response.data;
+      if (Array.isArray(filesData)) {
+        setFiles(filesData);
+      } else {
+        console.warn('API returned non-array data:', filesData);
+        setFiles([]);
+      }
+      
       setCurrentFolderId(folderId);
       
       // Update history only if this is a new navigation
@@ -58,6 +87,14 @@ export const FileProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error fetching files:', error);
+      
+      // Check if error is due to authentication
+      if (error.response && (error.response.status === 401 || error.response.status === 302)) {
+        console.warn('Authentication required, redirecting to login');
+        window.location.href = '/login';
+        return;
+      }
+      
       setFiles([]);
     } finally {
       setLoading(false);

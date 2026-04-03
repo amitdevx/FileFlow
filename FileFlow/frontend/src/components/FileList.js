@@ -76,7 +76,7 @@ function FileList({ viewMode, selectedFiles, setSelectedFiles, onContextMenu }) 
     return <div className="file-list-loading">Loading...</div>;
   }
 
-  if (!files || files.length === 0) {
+  if (!files || !Array.isArray(files) || files.length === 0) {
     return (
       <div className="file-list-empty">
         <i className="fas fa-folder-open"></i>
