@@ -12,7 +12,8 @@ import logging
 # Initialize Flask app
 app = Flask(__name__, 
             template_folder='../frontend/templates',
-            static_folder='../frontend')
+            static_folder='../frontend',
+            static_url_path='/static')
 app.config.from_object(Config)
 app.config['UPLOAD_FOLDER'] = Path(__file__).parent / app.config['UPLOAD_FOLDER']
 
