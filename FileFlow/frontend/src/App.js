@@ -87,11 +87,6 @@ function AppContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFiles, files]);
   
-  // Show login prompt if not authenticated (after all hooks)
-  if (!isAuthenticated) {
-    return <LoginPrompt />;
-  }
-  
   return (
     <div className="App">
       <header className="App-header">

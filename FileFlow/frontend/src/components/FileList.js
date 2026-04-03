@@ -1,9 +1,10 @@
 import React from 'react';
 import { useFiles } from '../context/FileContext';
+import LoginPrompt from './LoginPrompt';
 import './FileList.css';
 
 function FileList({ viewMode, selectedFiles, setSelectedFiles, onContextMenu }) {
-  const { files, loading, fetchFiles } = useFiles();
+  const { files, loading, fetchFiles, isAuthenticated } = useFiles();
 
   const handleClick = (file, e) => {
     if (e.ctrlKey || e.metaKey) {
@@ -74,6 +75,11 @@ function FileList({ viewMode, selectedFiles, setSelectedFiles, onContextMenu }) 
 
   if (loading) {
     return <div className="file-list-loading">Loading...</div>;
+  }
+
+  // Show login prompt if not authenticated
+  if (!isAuthenticated) {
+    return <LoginPrompt />;
   }
 
   if (!files || !Array.isArray(files) || files.length === 0) {
