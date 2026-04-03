@@ -97,14 +97,31 @@ The React frontend buttons (upload, new folder, rename, delete, download) were n
 
 ### Setup Requirements
 
-#### Backend Setup:
+#### Quick Start (Recommended):
+```bash
+cd FileFlow
+./start.sh
+```
+
+The `start.sh` script will automatically:
+- Create Flask virtual environment if it doesn't exist
+- Install all backend dependencies
+- Initialize the database
+- Install frontend npm dependencies
+- Start both Flask backend (port 5000) and React frontend (port 3000)
+
+Press Ctrl+C to stop both servers.
+
+#### Manual Setup (Alternative):
+
+**Backend Setup:**
 ```bash
 cd FileFlow
 python3 -m venv backend/venv
 backend/venv/bin/pip install -r backend/requirements.txt
 ```
 
-#### Start Backend:
+**Start Backend:**
 ```bash
 cd FileFlow
 export FLASK_APP=backend.app
@@ -112,19 +129,23 @@ export FLASK_ENV=development
 backend/venv/bin/flask run --host=0.0.0.0 --port=5000
 ```
 
-#### Frontend Setup:
+**Frontend Setup:**
 ```bash
 cd FileFlow/frontend
 npm install  # Installs axios and other dependencies
 ```
 
-#### Start Frontend:
+**Start Frontend:**
 ```bash
 cd FileFlow/frontend
 npm start  # Runs on http://localhost:3000
 ```
 
-Or use the provided `start.sh` script (requires modification to use venv).
+#### FastAPI Backend (Optional):
+```bash
+cd FileFlow
+./start.sh --fastapi
+```
 
 ## Testing
 
@@ -184,13 +205,23 @@ npm run build
 
 ## Next Steps
 
-To use the application:
+**To use the application:**
 
-1. Start the Flask backend (see "Start Backend" above)
-2. Start the React frontend: `cd frontend && npm start`
-3. Open http://localhost:3000 in your browser
-4. Sign up or log in to access the file manager
-5. All buttons should now work as expected!
+1. **One-Command Startup:**
+   ```bash
+   cd FileFlow
+   ./start.sh
+   ```
+
+2. Open **http://localhost:3000** in your browser
+
+3. Sign up or log in to access the file manager
+
+4. All buttons should now work as expected!
+
+**To stop:**
+- Press `Ctrl+C` in the terminal where start.sh is running
+- Both backend and frontend will stop automatically
 
 ## Notes
 
