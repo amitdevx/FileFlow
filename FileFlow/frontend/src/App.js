@@ -8,107 +8,175 @@ import SearchPanel from './components/SearchPanel';
 import PreviewPanel from './components/PreviewPanel';
 import ContextMenu from './components/ContextMenu';
 import { ThemeProvider } from './context/ThemeContext';
-import { FileProvider } from './context/FileContext';
+import { FileProvider, useFiles } from './context/FileContext';
 
-function App() {
-  const [viewMode, setViewMode] = useState('list'); // list, grid, details
+function AppContent() {
+  const [viewMode, setViewMode] = useState('list');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showPreview, setShowPreview] = useState(true);
   const [contextMenu, setContextMenu] = useState(null);
+  const [showRenameDialog, setShowRenameDialog] = useState(false);
+  const [renameFile, setRenameFile] = useState(null);
+  const [newFileName, setNewFileName] = useState('');
+  
+  const { files, deleteFiles, renameFile: doRename } = useFiles();
+  
+  const handleRename = (file) => {
+    setRenameFile(file);
+    setNewFileName(file.filename);
+    setShowRenameDialog(true);
+  };
+  
+  const handleRenameSubmit = async () => {
+    if (newFileName.trim() && newFileName !== renameFile.filename) {
+      await doRename(renameFile.id, newFileName.trim());
+    }
+    setShowRenameDialog(false);
+    setRenameFile(null);
+    setNewFileName('');
+    setSelectedFiles([]);
+  };
+  
+  const handleDelete = async (filesToDelete) => {
+    if (filesToDelete && filesToDelete.length > 0) {
+      const message = filesToDelete.length === 1 
+        ? `Delete "${filesToDelete[0].filename}"?`
+        : `Delete ${filesToDelete.length} items?`;
+      
+      if (window.confirm(message)) {
+        await deleteFiles(filesToDelete.map(f => f.id));
+        setSelectedFiles([]);
+      }
+    }
+  };
   
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Don't trigger shortcuts when typing in input fields
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      
       // Ctrl/Cmd + A: Select all
       if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
         e.preventDefault();
-        // selectAll();
-      }
-      // Ctrl/Cmd + C: Copy
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-        e.preventDefault();
-        // copyFiles();
-      }
-      // Ctrl/Cmd + X: Cut
-      if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
-        e.preventDefault();
-        // cutFiles();
-      }
-      // Ctrl/Cmd + V: Paste
-      if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
-        e.preventDefault();
-        // pasteFiles();
+        setSelectedFiles(files || []);
       }
       // Delete: Delete selected files
-      if (e.key === 'Delete') {
+      if (e.key === 'Delete' && selectedFiles.length > 0) {
         e.preventDefault();
-        // deleteFiles();
+        handleDelete(selectedFiles);
       }
       // F2: Rename
-      if (e.key === 'F2') {
+      if (e.key === 'F2' && selectedFiles.length === 1) {
         e.preventDefault();
-        // renameFile();
+        handleRename(selectedFiles[0]);
       }
       // Escape: Clear selection
       if (e.key === 'Escape') {
         setSelectedFiles([]);
         setContextMenu(null);
+        setShowRenameDialog(false);
       }
     };
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedFiles]);
+  }, [selectedFiles, files]);
   
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1><i className="fas fa-cloud"></i> FileFlow</h1>
+      </header>
+      
+      <Toolbar 
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        selectedFiles={selectedFiles}
+        onRename={handleRename}
+        onDelete={handleDelete}
+      />
+      
+      <SearchPanel />
+      
+      <main className="App-main">
+        <div className="file-browser">
+          <Breadcrumb />
+          <FileList 
+            viewMode={viewMode}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
+            onContextMenu={setContextMenu}
+          />
+        </div>
+        
+        {showPreview && selectedFiles.length === 1 && (
+          <PreviewPanel 
+            selectedFile={selectedFiles[0]}
+            onClose={() => setShowPreview(false)}
+          />
+        )}
+      </main>
+      
+      <StatusBar 
+        selectedCount={selectedFiles.length}
+        totalFiles={files?.length || 0}
+      />
+      
+      {contextMenu && (
+        <ContextMenu 
+          x={contextMenu.x}
+          y={contextMenu.y}
+          selectedFiles={selectedFiles}
+          onClose={() => {
+            setContextMenu(null);
+            setSelectedFiles([]);
+          }}
+        />
+      )}
+      
+      {/* Rename Dialog */}
+      {showRenameDialog && (
+        <div className="dialog-overlay">
+          <div className="dialog">
+            <h3>Rename</h3>
+            <input
+              type="text"
+              value={newFileName}
+              onChange={(e) => setNewFileName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleRenameSubmit();
+                if (e.key === 'Escape') setShowRenameDialog(false);
+              }}
+              autoFocus
+              onFocus={(e) => {
+                // Select filename without extension
+                const lastDot = newFileName.lastIndexOf('.');
+                if (lastDot > 0) {
+                  e.target.setSelectionRange(0, lastDot);
+                } else {
+                  e.target.select();
+                }
+              }}
+            />
+            <div className="dialog-buttons">
+              <button onClick={() => setShowRenameDialog(false)}>Cancel</button>
+              <button onClick={handleRenameSubmit} className="primary">Rename</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function App() {
   return (
     <ThemeProvider>
       <FileProvider>
-        <div className="App">
-          <header className="App-header">
-            <h1>FileFlow</h1>
-          </header>
-          
-          <Toolbar 
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            selectedFiles={selectedFiles}
-          />
-          
-          <SearchPanel />
-          
-          <main className="App-main">
-            <div className="file-browser">
-              <Breadcrumb />
-              <FileList 
-                viewMode={viewMode}
-                selectedFiles={selectedFiles}
-                setSelectedFiles={setSelectedFiles}
-                onContextMenu={setContextMenu}
-              />
-            </div>
-            
-            {showPreview && (
-              <PreviewPanel 
-                selectedFile={selectedFiles[0]}
-                onClose={() => setShowPreview(false)}
-              />
-            )}
-          </main>
-          
-          <StatusBar 
-            selectedCount={selectedFiles.length}
-            totalFiles={0}
-          />
-          
-          {contextMenu && (
-            <ContextMenu 
-              x={contextMenu.x}
-              y={contextMenu.y}
-              selectedFiles={selectedFiles}
-              onClose={() => setContextMenu(null)}
-            />
-          )}
-        </div>
+        <AppContent />
       </FileProvider>
     </ThemeProvider>
   );

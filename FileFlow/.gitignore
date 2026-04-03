@@ -23,3 +23,15 @@ speedtest*
 *.speedtest.log
 speedtest.log
 speedtest-results/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React build output
+frontend/build/
+
+# Database
+*.db
+*.sqlite3

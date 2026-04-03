@@ -11,6 +11,46 @@ from pathlib import Path
 
 files_bp = Blueprint('files_bp', __name__)
 
+@files_bp.route('/api/files')
+@login_required
+def get_files():
+    """JSON API endpoint to get files for the current user"""
+    folder_id = request.args.get('folder_id', type=int)
+    user_files = File.query.filter_by(user_id=current_user.id, parent_folder_id=folder_id).order_by(
+        File.is_folder.desc(),
+        File.filename
+    ).all()
+    
+    files_list = []
+    for f in user_files:
+        files_list.append({
+            'id': f.id,
+            'name': f.filename,
+            'filename': f.filename,
+            'is_folder': f.is_folder,
+            'size': f.size if hasattr(f, 'size') else 0,
+            'created_at': f.created_at.isoformat() if hasattr(f, 'created_at') and f.created_at else None,
+            'parent_folder_id': f.parent_folder_id
+        })
+    
+    return jsonify(files_list)
+
+@files_bp.route('/api/breadcrumbs/<int:folder_id>')
+@login_required
+def get_breadcrumbs(folder_id):
+    """Get breadcrumb trail for a folder"""
+    breadcrumbs = []
+    folder = File.query.get(folder_id)
+    
+    while folder:
+        if folder.user_id != current_user.id:
+            break
+        breadcrumbs.append({'id': folder.id, 'name': folder.filename})
+        folder = File.query.get(folder.parent_folder_id) if folder.parent_folder_id else None
+    
+    breadcrumbs.reverse()
+    return jsonify(breadcrumbs)
+
 @files_bp.route('/download_file/<int:file_id>')
 @login_required
 def download_file(file_id):

@@ -1,10 +1,108 @@
-.file-list table {
+.file-list {
+  flex: 1;
+  overflow: auto;
+  padding: 0.5rem;
+}
+
+.file-list-table table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.file-list th, .file-list td {
-  border: 1px solid #ccc;
-  padding: 8px;
+.file-list-table th {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
   text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+}
+
+.file-list-table td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.file-list-table tr {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.file-list-table tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+.file-list-table tr.selected {
+  background-color: rgba(74, 158, 255, 0.15);
+}
+
+.file-list-table tr.selected:hover {
+  background-color: rgba(74, 158, 255, 0.25);
+}
+
+.file-list-table .file-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.file-list-table .file-name-cell i {
+  color: var(--text-secondary);
+  width: 20px;
+  text-align: center;
+}
+
+.file-list-table .file-name-cell i.fa-folder {
+  color: #ffd43b;
+}
+
+/* Grid View */
+.file-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.file-list-grid .file-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  text-align: center;
+}
+
+.file-list-grid .file-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.file-list-grid .file-item.selected {
+  background-color: rgba(74, 158, 255, 0.15);
+  border: 1px solid var(--accent-color);
+}
+
+.file-list-grid .file-item i {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.file-list-grid .file-item i.fa-folder {
+  color: #ffd43b;
+}
+
+.file-list-grid .file-name {
+  font-size: 0.85rem;
+  word-break: break-word;
+  max-width: 100%;
+  color: var(--text-primary);
 }

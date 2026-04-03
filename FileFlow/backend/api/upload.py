@@ -1,4 +1,4 @@
-from flask import Blueprint, request, flash, redirect, url_for
+from flask import Blueprint, request, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 try:
@@ -14,7 +14,12 @@ upload_bp = Blueprint('upload_bp', __name__)
 @upload_bp.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
+    # Check if this is an AJAX/API request
+    is_api_request = request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
     if 'file' not in request.files:
+        if is_api_request:
+            return jsonify({'error': 'No file part'}), 400
         flash('No file part')
         return redirect(url_for('folders_bp.dashboard'))
     
@@ -22,12 +27,16 @@ def upload_file():
     folder_id = request.form.get('folder_id')
     
     if file.filename == '':
+        if is_api_request:
+            return jsonify({'error': 'No selected file'}), 400
         flash('No selected file')
         return redirect(url_for('folders_bp.dashboard'))
 
     # Define allowed extensions and validate the file
-    allowed_extensions = ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'zip', 'mp4', 'mov']
+    allowed_extensions = ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'zip', 'mp4', 'mov', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'mp3', 'wav', 'avi', 'mkv', 'html', 'css', 'js', 'py', 'json', 'xml', 'csv']
     if not Validators.allowed_file(file.filename, allowed_extensions):
+        if is_api_request:
+            return jsonify({'error': 'File type not allowed'}), 400
         flash('File type not allowed')
         return redirect(url_for('folders_bp.dashboard', folder_id=folder_id))
     
@@ -41,12 +50,26 @@ def upload_file():
         
         file.save(filepath)
         
-        new_file = File(filename=filename, filepath=filepath, 
+        # Get file size
+        file_size = filepath.stat().st_size if filepath.exists() else 0
+        
+        new_file = File(filename=filename, filepath=str(filepath), 
                         user_id=current_user.id, 
-                        parent_folder_id=folder_id)
+                        parent_folder_id=folder_id if folder_id else None)
         
         db.session.add(new_file)
         db.session.commit()
+        
+        if is_api_request:
+            return jsonify({
+                'success': True,
+                'file': {
+                    'id': new_file.id,
+                    'name': new_file.filename,
+                    'is_folder': False,
+                    'size': file_size
+                }
+            })
         
         flash('File uploaded successfully')
         return redirect(url_for('folders_bp.dashboard', folder_id=folder_id))

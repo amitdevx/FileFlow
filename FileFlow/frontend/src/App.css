@@ -8,6 +8,7 @@
   --border-color: #ddd;
   --accent-color: #007bff;
   --accent-hover: #0056b3;
+  --danger-color: #dc3545;
 }
 
 :root[data-theme="dark"] {
@@ -19,6 +20,7 @@
   --border-color: #444;
   --accent-color: #4a9eff;
   --accent-hover: #357abd;
+  --danger-color: #ff6b6b;
 }
 
 * {
@@ -56,6 +58,10 @@ body {
   font-weight: 600;
 }
 
+.App-header h1 i {
+  margin-right: 0.5rem;
+}
+
 .App-main {
   display: flex;
   flex: 1;
@@ -69,6 +75,124 @@ body {
   overflow: hidden;
   background-color: var(--bg-primary);
   border-right: 1px solid var(--border-color);
+}
+
+/* Dialog Overlay */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dialog h3 {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.dialog input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dialog input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.dialog-buttons button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.dialog-buttons button:hover {
+  background: var(--bg-hover);
+}
+
+.dialog-buttons button.primary {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.dialog-buttons button.primary:hover {
+  background: var(--accent-hover);
+}
+
+/* Empty State */
+.file-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  padding: 2rem;
+}
+
+.file-list-empty i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.file-list-empty p {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.file-list-empty .hint {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.file-list-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+}
+
+/* Favorite Icon */
+.favorite-icon {
+  color: gold;
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
 }
 
 /* Responsive Design */

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const FileContext = createContext();
@@ -15,97 +15,159 @@ export const FileProvider = ({ children }) => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentFolderId, setCurrentFolderId] = useState(null);
-  const [clipboard, setClipboard] = useState({ files: [], operation: null }); // cut or copy
-  const [history, setHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
+  const [clipboard, setClipboard] = useState({ files: [], operation: null });
+  const [history, setHistory] = useState([null]);
+  const [historyIndex, setHistoryIndex] = useState(0);
   
-  const fetchFiles = async (folderId = null) => {
+  const fetchFiles = useCallback(async (folderId = null, addToHistory = true) => {
     setLoading(true);
     try {
-      const url = folderId ? `/api/folder/${folderId}` : '/api/files';
-      const response = await axios.get(url);
-      setFiles(response.data);
+      // Use the JSON API endpoint
+      const url = folderId 
+        ? `/api/files?folder_id=${folderId}` 
+        : '/api/files';
+      
+      const response = await axios.get(url, {
+        headers: { 'Accept': 'application/json' }
+      });
+      
+      setFiles(response.data || []);
       setCurrentFolderId(folderId);
       
-      // Update history
-      const newHistory = history.slice(0, historyIndex + 1);
-      newHistory.push(folderId);
-      setHistory(newHistory);
-      setHistoryIndex(newHistory.length - 1);
+      // Update history only if this is a new navigation
+      if (addToHistory && history[historyIndex] !== folderId) {
+        setHistory(prev => {
+          const newHistory = prev.slice(0, historyIndex + 1);
+          newHistory.push(folderId);
+          return newHistory;
+        });
+        setHistoryIndex(prev => prev + 1);
+      }
+      
+      // Fetch breadcrumbs if in a folder
+      if (folderId) {
+        try {
+          const breadcrumbResponse = await axios.get(`/api/breadcrumbs/${folderId}`);
+          setBreadcrumbs(breadcrumbResponse.data || []);
+        } catch {
+          setBreadcrumbs([]);
+        }
+      } else {
+        setBreadcrumbs([]);
+      }
     } catch (error) {
       console.error('Error fetching files:', error);
+      setFiles([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [historyIndex, history]);
   
-  const goBack = () => {
+  const goBack = useCallback(() => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
       setHistoryIndex(newIndex);
-      fetchFiles(history[newIndex]);
+      fetchFiles(history[newIndex], false);
     }
-  };
+  }, [historyIndex, history, fetchFiles]);
   
-  const goForward = () => {
+  const goForward = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const newIndex = historyIndex + 1;
       setHistoryIndex(newIndex);
-      fetchFiles(history[newIndex]);
+      fetchFiles(history[newIndex], false);
     }
-  };
+  }, [historyIndex, history, fetchFiles]);
   
   const uploadFile = async (file, folderId = null) => {
     const formData = new FormData();
     formData.append('file', file);
-    if (folderId) formData.append('folder_id', folderId);
+    if (folderId || currentFolderId) {
+      formData.append('folder_id', folderId || currentFolderId);
+    }
     
     try {
-      await axios.post('/api/upload', formData);
-      fetchFiles(currentFolderId);
+      await axios.post('/upload', formData, {
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      fetchFiles(currentFolderId, false);
+      return { success: true };
     } catch (error) {
       console.error('Error uploading file:', error);
+      return { success: false, error: error.response?.data?.error || error.message };
     }
   };
   
   const createFolder = async (name) => {
     try {
-      await axios.post('/api/create_folder', {
+      await axios.post('/create_folder', {
         folder_name: name,
         parent_folder_id: currentFolderId
+      }, {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
-      fetchFiles(currentFolderId);
+      fetchFiles(currentFolderId, false);
+      return { success: true };
     } catch (error) {
       console.error('Error creating folder:', error);
+      return { success: false, error: error.response?.data?.error || error.message };
     }
   };
   
   const deleteFiles = async (fileIds) => {
     try {
-      await Promise.all(fileIds.map(id => axios.delete(`/api/delete_file/${id}`)));
-      fetchFiles(currentFolderId);
+      await Promise.all(fileIds.map(id => 
+        axios.delete(`/delete_file/${id}`, {
+          headers: { 'Accept': 'application/json' }
+        })
+      ));
+      fetchFiles(currentFolderId, false);
+      return { success: true };
     } catch (error) {
       console.error('Error deleting files:', error);
+      return { success: false, error: error.response?.data?.error || error.message };
     }
   };
   
   const renameFile = async (fileId, newName) => {
     try {
-      await axios.post(`/api/rename_file/${fileId}`, { new_name: newName });
-      fetchFiles(currentFolderId);
+      await axios.post(`/rename_file/${fileId}`, { new_name: newName }, {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+      fetchFiles(currentFolderId, false);
+      return { success: true };
     } catch (error) {
       console.error('Error renaming file:', error);
+      return { success: false, error: error.response?.data?.error || error.message };
     }
   };
   
   const moveFiles = async (fileIds, destinationFolderId) => {
     try {
       await Promise.all(fileIds.map(id => 
-        axios.post(`/api/move_file/${id}`, { destination_folder_id: destinationFolderId })
+        axios.post(`/move_file/${id}`, { destination_folder_id: destinationFolderId }, {
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        })
       ));
-      fetchFiles(currentFolderId);
+      fetchFiles(currentFolderId, false);
+      return { success: true };
     } catch (error) {
       console.error('Error moving files:', error);
+      return { success: false, error: error.response?.data?.error || error.message };
     }
   };
   
@@ -121,13 +183,11 @@ export const FileProvider = ({ children }) => {
     if (clipboard.operation === 'move' || clipboard.operation === 'cut') {
       await moveFiles(clipboard.files, currentFolderId);
     }
-    // TODO: Implement copy operation
     setClipboard({ files: [], operation: null });
   };
   
   useEffect(() => {
-    fetchFiles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchFiles(null, false);
   }, []);
   
   return (
@@ -135,6 +195,7 @@ export const FileProvider = ({ children }) => {
       files,
       loading,
       currentFolderId,
+      breadcrumbs,
       clipboard,
       history,
       historyIndex,

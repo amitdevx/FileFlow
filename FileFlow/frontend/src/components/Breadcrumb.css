@@ -1,8 +1,33 @@
 .breadcrumb {
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb a {
+  color: var(--accent-color);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.15s;
+}
+
+.breadcrumb a:hover {
+  background-color: var(--bg-hover);
+  text-decoration: underline;
+}
+
+.breadcrumb a i {
+  font-size: 0.9rem;
 }
 
 .breadcrumb span {
-  margin-right: 5px;
+  color: var(--text-secondary);
 }
