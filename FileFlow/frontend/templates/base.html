@@ -2,15 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>FileFlow - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
     <nav>
         <div class="nav-wrapper">
-            <a href="{{ url_for('auth_bp.home') }}" class="brand-logo">FileFloW</a>
-            <ul class="nav-links">
+            <a href="{{ url_for('auth_bp.home') }}" class="brand-logo">FileFlow</a>
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links" id="nav-links">
                 {% if current_user.is_authenticated %}
                     <li><a href="{{ url_for('folders_bp.dashboard') }}">Dashboard</a></li>
                     <li><a href="{{ url_for('auth_bp.logout') }}">Logout</a></li>
@@ -36,6 +40,20 @@
         {% block content %}{% endblock %}
     </main>
 
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('mobile-menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    this.classList.toggle('active');
+                });
+            }
+        });
+    </script>
     <script src="{{ url_for('static', filename='js/file_management.js') }}"></script>
 </body>
 </html>

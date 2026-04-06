@@ -40,7 +40,10 @@ def create_folder():
         if request.is_json:
             return jsonify({'error': 'Folder name is required'}), 400
         flash('Folder name is required')
-        return redirect(url_for('folders_bp.dashboard', folder_id=parent_folder_id))
+        parent_id = int(parent_folder_id) if parent_folder_id else None
+        if parent_id:
+            return redirect(url_for('folders_bp.dashboard', folder_id=parent_id))
+        return redirect(url_for('folders_bp.dashboard'))
     
     new_folder = File(filename=folder_name, 
                       filepath='', 
@@ -62,4 +65,7 @@ def create_folder():
         })
     
     flash('Folder created successfully')
-    return redirect(url_for('folders_bp.dashboard', folder_id=parent_folder_id))
+    parent_id = int(parent_folder_id) if parent_folder_id else None
+    if parent_id:
+        return redirect(url_for('folders_bp.dashboard', folder_id=parent_id))
+    return redirect(url_for('folders_bp.dashboard'))
