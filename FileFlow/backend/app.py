@@ -32,6 +32,20 @@ login_manager.login_view = 'auth_bp.login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Template filters
+@app.template_filter('format_filesize')
+def format_filesize(size):
+    """Format file size in human-readable format."""
+    try:
+        size = int(size)
+        for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+            if size < 1024.0:
+                return f"{size:.1f} {unit}"
+            size /= 1024.0
+        return f"{size:.1f} PB"
+    except (ValueError, TypeError):
+        return "0 B"
+
 
 
 # Error handlers

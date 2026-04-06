@@ -30,16 +30,43 @@
             {% for file in files %}
                 <div class="file-item" data-id="{{ file.id }}" data-name="{{ file.filename|e }}" data-type="{{ 'folder' if file.is_folder else 'file' }}" data-size="{{ file.filesize|int }}" data-date="{{ file.created_at.isoformat() if file.created_at else '' }}" draggable="true">
                 <div class="file-icon">
-                        <i class="fas {{ 'fa-folder' if file.is_folder else 'fa-file' }}" aria-hidden="true"></i>
+                    {% if file.is_folder %}
+                        <i class="fas fa-folder" aria-hidden="true"></i>
+                    {% else %}
+                        {% set extension = file.filename.split('.')[-1].lower() if '.' in file.filename else '' %}
+                        {% if extension in ['pdf'] %}
+                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                        {% elif extension in ['doc', 'docx'] %}
+                            <i class="fas fa-file-word" aria-hidden="true"></i>
+                        {% elif extension in ['xls', 'xlsx', 'csv'] %}
+                            <i class="fas fa-file-excel" aria-hidden="true"></i>
+                        {% elif extension in ['ppt', 'pptx'] %}
+                            <i class="fas fa-file-powerpoint" aria-hidden="true"></i>
+                        {% elif extension in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'] %}
+                            <i class="fas fa-file-image" aria-hidden="true"></i>
+                        {% elif extension in ['mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm'] %}
+                            <i class="fas fa-file-video" aria-hidden="true"></i>
+                        {% elif extension in ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a'] %}
+                            <i class="fas fa-file-audio" aria-hidden="true"></i>
+                        {% elif extension in ['zip', 'rar', '7z', 'tar', 'gz', 'bz2'] %}
+                            <i class="fas fa-file-archive" aria-hidden="true"></i>
+                        {% elif extension in ['html', 'css', 'js', 'py', 'java', 'cpp', 'c', 'php', 'rb', 'go', 'rs', 'ts', 'jsx', 'tsx', 'json', 'xml', 'yaml', 'yml'] %}
+                            <i class="fas fa-file-code" aria-hidden="true"></i>
+                        {% elif extension in ['txt', 'md'] %}
+                            <i class="fas fa-file-lines" aria-hidden="true"></i>
+                        {% else %}
+                            <i class="fas fa-file" aria-hidden="true"></i>
+                        {% endif %}
+                    {% endif %}
                 </div>
-                <div class="file-name">
+                <div class="file-name" title="{{ file.filename|e }}">
                     {% if file.is_folder %}
                             <a href="{{ url_for('folders_bp.dashboard', folder_id=file.id) }}">{{ file.filename|e }}</a>
                     {% else %}
                             {{ file.filename|e }}
                     {% endif %}
                 </div>
-                    <div class="file-size">{{ file.filesize|int }}</div>
+                    <div class="file-size">{{ file.filesize|format_filesize }}</div>
                     <div class="file-date">{{ file.created_at.strftime('%Y-%m-%d %H:%M') if file.created_at else '' }}</div>
                 <div class="file-actions-item">
                     {% if not file.is_folder %}

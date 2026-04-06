@@ -294,7 +294,7 @@ main {
 
 .file-item {
     display: grid;
-    grid-template-columns: auto 1fr auto auto auto;
+    grid-template-columns: 40px minmax(200px, 2fr) minmax(100px, 1fr) minmax(150px, 1fr) auto;
     gap: 1rem;
     align-items: center;
     padding: 0.75rem 1rem;
@@ -316,6 +316,8 @@ main {
     color: #666;
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 40px;
 }
 
 .file-icon i.fa-folder {
@@ -323,14 +325,50 @@ main {
 }
 
 .file-icon i.fa-file {
-    color: #007bff;
+    color: #6c757d;
+}
+
+.file-icon i.fa-file-pdf {
+    color: #dc3545;
+}
+
+.file-icon i.fa-file-word {
+    color: #2b579a;
+}
+
+.file-icon i.fa-file-excel {
+    color: #217346;
+}
+
+.file-icon i.fa-file-powerpoint {
+    color: #d24726;
+}
+
+.file-icon i.fa-file-image {
+    color: #17a2b8;
+}
+
+.file-icon i.fa-file-video {
+    color: #6610f2;
+}
+
+.file-icon i.fa-file-audio {
+    color: #e83e8c;
+}
+
+.file-icon i.fa-file-archive {
+    color: #fd7e14;
+}
+
+.file-icon i.fa-file-code {
+    color: #28a745;
 }
 
 .file-name {
     font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
 }
 
 .file-name a {
@@ -401,10 +439,13 @@ main {
 .file-browser-grid-view .file-name {
     font-size: 0.85rem;
     word-break: break-word;
+    overflow-wrap: break-word;
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    line-height: 1.3;
+    max-height: 3.9em;
 }
 
 .file-browser-grid-view .file-size,
