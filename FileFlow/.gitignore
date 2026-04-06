@@ -5,6 +5,8 @@ __pycache__/
 # Virtual environment / env files
 venv/
 .env
+.env.local
+.env.*.local
 
 # OS files
 .DS_Store
@@ -35,3 +37,12 @@ frontend/build/
 # Database
 *.db
 *.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Render
+.render/
