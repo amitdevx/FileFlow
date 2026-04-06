@@ -3,16 +3,8 @@ services:
     name: fileflow
     runtime: python
     pythonVersion: 3.11
-    
-    buildCommand: |
-      pip install -r FileFlow/backend/requirements.txt && \
-      cd FileFlow && \
-      python -c "from backend.app import app, db; app.app_context().push(); db.create_all()"
-    
-    startCommand: |
-      cd FileFlow && \
-      gunicorn -w 4 -b 0.0.0.0:$PORT "backend.app:app"
-    
+    buildCommand: "pip install -r FileFlow/backend/requirements.txt && cd FileFlow && python -c \"from backend.app import app, db; app.app_context().push(); db.create_all()\""
+    startCommand: "cd FileFlow && gunicorn -w 4 -b 0.0.0.0:$PORT 'backend.app:app'"
     envVars:
       - key: FLASK_ENV
         value: production
@@ -22,17 +14,10 @@ services:
         fromDatabase:
           name: fileflow_db
           property: connectionString
-    
     healthCheckPath: /
-    
-    disk:
-      - name: fileflow_storage
-        mountPath: /var/data/fileflow
-        sizeGB: 10
 
 databases:
   - name: fileflow_db
     databaseName: fileflow
     user: fileflow_user
     region: oregon
-    plan: free
