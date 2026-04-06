@@ -294,10 +294,10 @@ main {
 
 .file-item {
     display: grid;
-    grid-template-columns: 40px minmax(200px, 2fr) minmax(100px, 1fr) minmax(150px, 1fr) auto;
-    gap: 1rem;
+    grid-template-columns: 50px minmax(200px, 2fr) minmax(100px, 1fr) minmax(150px, 1fr) auto;
+    gap: 1.5rem;
     align-items: center;
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.5rem;
     border-bottom: 1px solid #f0f0f0;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -312,12 +312,13 @@ main {
 }
 
 .file-icon {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     color: #666;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
+    width: 50px;
+    height: 50px;
 }
 
 .file-icon i.fa-folder {
@@ -408,9 +409,9 @@ main {
 
 .file-browser-grid-view {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1rem;
-    padding: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
     overflow-y: auto;
 }
 
@@ -419,11 +420,12 @@ main {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 1rem;
+    padding: 1.5rem 1rem;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     background-color: #fff;
     transition: all 0.3s ease;
+    min-height: 140px;
 }
 
 .file-browser-grid-view .file-item:hover {
@@ -432,8 +434,8 @@ main {
 }
 
 .file-browser-grid-view .file-icon {
-    margin-bottom: 0.75rem;
-    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-size: 3.5rem;
 }
 
 .file-browser-grid-view .file-name {
@@ -670,9 +672,9 @@ main {
 
     /* Hide file size and date on mobile for list view */
     .file-browser-list-view .file-item {
-        grid-template-columns: auto 1fr auto;
-        gap: 0.5rem;
-        padding: 0.75rem 0.5rem;
+        grid-template-columns: 45px 1fr auto;
+        gap: 1rem;
+        padding: 1rem 0.75rem;
     }
 
     .file-browser-list-view .file-size,
@@ -681,7 +683,9 @@ main {
     }
 
     .file-icon {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
+        width: 45px;
+        height: 45px;
     }
 
     .file-name {
@@ -701,22 +705,23 @@ main {
 
     /* Grid view adjustments */
     .file-browser-grid-view {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 0.75rem;
-        padding: 0.75rem;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
     }
 
     .file-browser-grid-view .file-item {
-        padding: 0.75rem 0.5rem;
+        padding: 1rem 0.75rem;
+        min-height: 120px;
     }
 
     .file-browser-grid-view .file-icon {
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
+        font-size: 2.75rem;
+        margin-bottom: 0.75rem;
     }
 
     .file-browser-grid-view .file-name {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
     }
 
     .status-bar {
