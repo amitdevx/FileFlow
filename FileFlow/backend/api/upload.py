@@ -69,7 +69,8 @@ def upload_file():
         
         new_file = File(filename=filename, filepath=str(filepath), 
                         user_id=current_user.id, 
-                        parent_folder_id=parent_folder_id)
+                        parent_folder_id=parent_folder_id,
+                        filesize=file_size)
         
         db.session.add(new_file)
         db.session.commit()
