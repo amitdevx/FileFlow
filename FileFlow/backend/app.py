@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from flask_login import LoginManager
+from flask_compress import Compress
 try:
     from backend.models.database import db, User, bcrypt
     from backend.config import Config
@@ -19,6 +20,9 @@ app.config['UPLOAD_FOLDER'] = Path(__file__).parent / app.config['UPLOAD_FOLDER'
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
+
+# Initialize compression for faster downloads
+Compress(app)
 
 # Initialize extensions
 db.init_app(app)

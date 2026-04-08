@@ -19,3 +19,12 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = 'user_files'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file upload
+    
+    # Performance optimization settings
+    SEND_FILE_MAX_AGE_DEFAULT = 31536000  # 1 year cache for static files
+    JSON_SORT_KEYS = False  # Disable JSON key sorting for performance
+    PROPAGATE_EXCEPTIONS = True
+    PRESERVE_CONTEXT_ON_EXCEPTION = False
+    
+    # Compression settings (for nginx to use gzip)
+    COMPRESSION_ENABLED = True

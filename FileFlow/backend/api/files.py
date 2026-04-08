@@ -1,4 +1,4 @@
-from flask import Blueprint, send_file, abort, jsonify, request
+from flask import Blueprint, send_file, abort, jsonify, request, make_response
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 try:
@@ -9,6 +9,7 @@ except ImportError:
     from utils.validators import Validators
 from pathlib import Path
 import logging
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -72,12 +73,28 @@ def download_file(file_id):
             abort(400, description="Cannot download a folder")
         
         mimetype = file.mimetype or 'application/octet-stream'
-        return send_file(
+        
+        # Use send_file with optimizations
+        # X-Sendfile support for nginx/apache (much faster for large files)
+        response = send_file(
             str(filepath),
             as_attachment=True,
             download_name=secure_filename(file.filename),
-            mimetype=mimetype
+            mimetype=mimetype,
+            conditional=True  # Enable HTTP 304 Not Modified responses
         )
+        
+        # Add cache headers for better performance
+        response.cache_control.max_age = 86400  # 24 hours
+        response.cache_control.public = True
+        
+        # Add ETag for client-side caching
+        file_stat = filepath.stat()
+        etag = f'{file_stat.st_mtime}-{file_stat.st_size}'
+        response.set_etag(etag)
+        
+        logger.info(f"File download started: {file.filename} (ID: {file_id}, Size: {file_stat.st_size})")
+        return response
         
     except Exception as e:
         logger.error(f"Error downloading file {file_id}: {str(e)}", exc_info=True)
@@ -101,11 +118,26 @@ def view_file(file_id):
             abort(400, description="Cannot view a folder")
         
         mimetype = file.mimetype or 'application/octet-stream'
-        return send_file(
+        
+        # Use send_file with optimizations
+        response = send_file(
             str(filepath),
             as_attachment=False,
-            mimetype=mimetype
+            mimetype=mimetype,
+            conditional=True  # Enable HTTP 304 Not Modified responses
         )
+        
+        # Add cache headers for better performance
+        response.cache_control.max_age = 3600  # 1 hour
+        response.cache_control.public = True
+        
+        # Add ETag for client-side caching
+        file_stat = filepath.stat()
+        etag = f'{file_stat.st_mtime}-{file_stat.st_size}'
+        response.set_etag(etag)
+        
+        logger.info(f"File view started: {file.filename} (ID: {file_id}, Size: {file_stat.st_size})")
+        return response
         
     except Exception as e:
         logger.error(f"Error viewing file {file_id}: {str(e)}", exc_info=True)
