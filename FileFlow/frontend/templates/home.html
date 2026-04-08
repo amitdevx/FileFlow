@@ -10,6 +10,8 @@
     
     <h1>FileFlow: Cloud File Manager</h1>
     
+    <p style="font-size: 0.95rem; color: #666; margin-bottom: 2rem;">Created by: Divekar Amit Eknath</p>
+    
     {% if not current_user.is_authenticated %}
         <div class="auth-buttons">
             <a href="{{ url_for('auth_bp.login') }}" class="btn">Login</a>
