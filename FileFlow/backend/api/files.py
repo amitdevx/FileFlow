@@ -8,6 +8,9 @@ except ImportError:
     from models.database import db, File
     from utils.validators import Validators
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 files_bp = Blueprint('files_bp', __name__)
 
@@ -28,7 +31,7 @@ def get_files():
             'name': f.filename,
             'filename': f.filename,
             'is_folder': f.is_folder,
-            'size': f.size if hasattr(f, 'size') else 0,
+            'size': f.filesize if hasattr(f, 'filesize') else 0,
             'created_at': f.created_at.isoformat() if hasattr(f, 'created_at') and f.created_at else None,
             'parent_folder_id': f.parent_folder_id
         })
@@ -60,20 +63,24 @@ def download_file(file_id):
         if file.user_id != current_user.id:
             abort(403, description="You don't have permission to access this file")
             
-        if not Path(file.filepath).exists():
+        filepath = Path(file.filepath)
+        if not filepath.exists():
+            logger.warning(f"File not found on disk: {file.filepath}")
             abort(404, description="File not found in storage")
             
         if file.is_folder:
             abort(400, description="Cannot download a folder")
-            
+        
+        mimetype = file.mimetype or 'application/octet-stream'
         return send_file(
-            file.filepath,
+            str(filepath),
             as_attachment=True,
-            download_name=secure_filename(file.filename)
+            download_name=secure_filename(file.filename),
+            mimetype=mimetype
         )
         
     except Exception as e:
-        # app.logger.error(f"Error downloading file: {str(e)}")
+        logger.error(f"Error downloading file {file_id}: {str(e)}", exc_info=True)
         abort(500, description="Error occurred while downloading file")
 
 @files_bp.route('/view_file/<int:file_id>')
@@ -85,19 +92,23 @@ def view_file(file_id):
         if file.user_id != current_user.id:
             abort(403, description="You don't have permission to access this file")
             
-        if not Path(file.filepath).exists():
+        filepath = Path(file.filepath)
+        if not filepath.exists():
+            logger.warning(f"File not found on disk: {file.filepath}")
             abort(404, description="File not found in storage")
             
         if file.is_folder:
             abort(400, description="Cannot view a folder")
-            
+        
+        mimetype = file.mimetype or 'application/octet-stream'
         return send_file(
-            file.filepath,
-            as_attachment=False
+            str(filepath),
+            as_attachment=False,
+            mimetype=mimetype
         )
         
     except Exception as e:
-        # app.logger.error(f"Error viewing file: {str(e)}")
+        logger.error(f"Error viewing file {file_id}: {str(e)}", exc_info=True)
         abort(500, description="Error occurred while viewing file")
 
 @files_bp.route('/delete_file/<int:file_id>', methods=['DELETE'])
@@ -117,20 +128,22 @@ def delete_file(file_id):
                         delete_folder_contents(item.id)
                     else:
                         try:
-                            if Path(item.filepath).exists():
-                                Path(item.filepath).unlink()
+                            filepath = Path(item.filepath)
+                            if filepath.exists():
+                                filepath.unlink()
                         except OSError as e:
-                            # app.logger.error(f"Error deleting file {item.filepath}: {str(e)}")
+                            logger.warning(f"Error deleting file {item.filepath}: {str(e)}")
                             pass
                     db.session.delete(item)
                 
             delete_folder_contents(file.id)
         else:
             try:
-                if Path(file.filepath).exists():
-                    Path(file.filepath).unlink()
+                filepath = Path(file.filepath)
+                if filepath.exists():
+                    filepath.unlink()
             except OSError as e:
-                # app.logger.error(f"Error deleting file {file.filepath}: {str(e)}")
+                logger.warning(f"Error deleting file {file.filepath}: {str(e)}")
                 pass
         
         db.session.delete(file)
@@ -139,7 +152,7 @@ def delete_file(file_id):
         
     except Exception as e:
         db.session.rollback()
-        # app.logger.error(f"Error in delete_file: {str(e)}")
+        logger.error(f"Error in delete_file: {str(e)}", exc_info=True)
         return jsonify({'error': 'Failed to delete file'}), 500
 
 @files_bp.route('/rename_file/<int:file_id>', methods=['POST'])
