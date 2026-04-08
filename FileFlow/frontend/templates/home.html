@@ -1,18 +1,58 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Welcome - FileFlow{% endblock %}
 
 {% block content %}
-<div class="home-container">
-    <h1>Welcome to FileFlow</h1>
-    {% if not current_user.is_authenticated %}
-        <div class="auth-buttons">
-            <a href="{{ url_for('auth_bp.login') }}" class="btn">Login</a>
-            <a href="{{ url_for('auth_bp.signup') }}" class="btn">Sign Up</a>
+<div class="welcome-page">
+    <!-- College Header -->
+    <div class="college-header">
+        <div class="college-header-content">
+            <p class="college-name">Karmaveer Punjababa Goverdhane<br>Arts, Commerce and Science College</p>
+            <p class="department">DEPARTMENT OF COMPUTER SCIENCE</p>
         </div>
-    {% else %}
-        <div class="dashboard-link">
-            <a href="{{ url_for('folders_bp.dashboard') }}" class="btn">Go to Dashboard</a>
+    </div>
+
+    <!-- Project Section -->
+    <div class="project-section">
+        <!-- Logo -->
+        <div class="project-logo">
+            <img src="{{ url_for('static', filename='mvp-logo.png') }}" alt="FileFlow Logo">
         </div>
-    {% endif %}
+
+        <!-- Project Title -->
+        <h1 class="project-title">FileFlow: Cloud File Manager</h1>
+
+        <!-- Project Info -->
+        <div class="project-info">
+            <p class="course-code">CS-281-FP</p>
+            <p class="project-type">MINI PROJECT REPORT</p>
+            <p class="academic-year">Project Academic Year (2025 - 2026)</p>
+        </div>
+
+        <!-- Project Details -->
+        <div class="project-details">
+            <div class="detail-section">
+                <h3>PROJECT GUIDE</h3>
+                <p>Prof. Miss. Bhagyashree N. Sonar</p>
+            </div>
+            <div class="detail-section">
+                <h3>SUBMITTED BY</h3>
+                <p>Divekar Amit Eknath</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="welcome-actions">
+            {% if not current_user.is_authenticated %}
+                <div class="auth-buttons">
+                    <a href="{{ url_for('auth_bp.login') }}" class="btn btn-primary">Login</a>
+                    <a href="{{ url_for('auth_bp.signup') }}" class="btn btn-secondary">Sign Up</a>
+                </div>
+            {% else %}
+                <div class="dashboard-link">
+                    <a href="{{ url_for('folders_bp.dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}
